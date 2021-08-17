@@ -30,12 +30,14 @@ public class ControllerAdvice {
 		}).collect(Collectors.toList());
 		return erros;
 	}
-	
+
 	@ResponseStatus(value = HttpStatus.NOT_FOUND)
-	@ExceptionHandler(value = {IllegalArgumentException.class,EntityNotFoundException.class, EntityExistsException.class} )
+	@ExceptionHandler(value = { IllegalArgumentException.class, EntityNotFoundException.class,
+			EntityExistsException.class, RuntimeException.class })
 	public ErroDto getErro(Exception ex) {
-		//String message2 = message.getMessage(null, LocaleContextHolder.getLocale());
-		//return new ErroDto(null, message2);
+		// String message2 = message.getMessage(null, LocaleContextHolder.getLocale());
+		// return new ErroDto(null, message2);
 		return new ErroDto(null, ex.getMessage());
 	}
+
 }

@@ -6,24 +6,39 @@ import javax.persistence.EntityNotFoundException;
 
 import org.springframework.stereotype.Service;
 
+import com.br.santander.emprestimo.model.Parcela;
 import com.br.santander.emprestimo.model.Proposta;
+import com.br.santander.emprestimo.model.dto.PropostaSimulacaoDto;
 import com.br.santander.emprestimo.repository.PropostaRepository;
+import com.br.santander.emprestimo.service.ParcelaService;
 import com.br.santander.emprestimo.service.PropostaService;
+
 @Service
 public class PropostaServiceImpl implements PropostaService {
 
 	private final PropostaRepository propostaRepository;
+	private final ParcelaService parcelaService;
 
-	public PropostaServiceImpl(PropostaRepository propostaRepository) {
+	public PropostaServiceImpl(PropostaRepository propostaRepository, ParcelaService parcelaService) {
 		this.propostaRepository = propostaRepository;
+		this.parcelaService = parcelaService;
 	}
 
 	@Override
 	public Proposta salvar(Proposta proposta) {
 		if (proposta.validarEnquadramentoProposta()) {
-			return propostaRepository.save(proposta);
+			PropostaSimulacaoDto simular = proposta.simular();
+			for (int i = 1; i <= proposta.getQuantidadeParcelas(); i++) {
+				Parcela parcela = new Parcela(simular.getValorParcela(), i, proposta);
+				proposta.addParcela(parcela);
+				
+			}
+			Proposta propostaSalva = propostaRepository.save(proposta);
+			proposta.getParcelas().forEach(p -> parcelaService.salvar(p));
+
+			return propostaSalva;
 		}
-		
+
 		throw new RuntimeException("Proposta não enquadrada");
 	}
 
@@ -34,7 +49,8 @@ public class PropostaServiceImpl implements PropostaService {
 
 	@Override
 	public Proposta buscarPorId(Integer id) {
-		return propostaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Não existe proposta com o id " + id));
+		return propostaRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Não existe proposta com o id " + id));
 	}
 
 	@Override

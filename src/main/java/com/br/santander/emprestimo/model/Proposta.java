@@ -16,14 +16,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.br.santander.emprestimo.model.dto.PropostaSimulacaoDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Proposta {
 
 	private static Double TAXA_JUROS = 0.0117;
 	private static BigDecimal UM = new BigDecimal(1);
-	private static BigDecimal PERCENTUAL_MAX_PRESTACAO = new BigDecimal(15);
-	private static BigDecimal PATRIMONIO_MIN = new BigDecimal(100000);
+	private static BigDecimal PERCENTUAL_MAX_PRESTACAO = new BigDecimal(0.15);
+	private static BigDecimal PATRIMONIO_MIN = new BigDecimal(300000);
 	private static long QUANTIDADE_MESES_MIN = 15L;
 
 	@Id
@@ -32,6 +33,7 @@ public class Proposta {
 	private BigDecimal valor;
 	private Double taxaJuros;
 	private Integer quantidadeParcelas;
+	@JsonIgnore
 	@ManyToOne
 	private Cliente cliente;
 	private LocalDate dataContratacao;
@@ -90,7 +92,8 @@ public class Proposta {
 
 	private BigDecimal calcularPrestacao() {
 		BigDecimal valor = new BigDecimal(Math.pow((1 + TAXA_JUROS), this.quantidadeParcelas));
-		BigDecimal valor2 = valor.multiply(new BigDecimal(TAXA_JUROS)).divide(valor.subtract(UM), 5, RoundingMode.HALF_UP);
+		BigDecimal valor2 = valor.multiply(new BigDecimal(TAXA_JUROS)).divide(valor.subtract(UM), 5,
+				RoundingMode.HALF_UP);
 		BigDecimal PMT = this.valor.multiply(valor2);
 
 		return PMT;
@@ -98,24 +101,35 @@ public class Proposta {
 
 	public boolean validarEnquadramentoProposta() {
 		if (this.cliente.calcularTempoServico() < QUANTIDADE_MESES_MIN) {
-			return false;
+			throw new RuntimeException("proposta não aprovada, tempo de serviço " + this.cliente.calcularTempoServico()
+					+ " menor que " + QUANTIDADE_MESES_MIN);
 		}
 
 		if (this.cliente.getPatrimonio().compareTo(PATRIMONIO_MIN) < 0) {
-			return false;
+			throw new RuntimeException("proposta não aprovada, patrimonio " + this.cliente.getPatrimonio()
+					+ " menor que " + PATRIMONIO_MIN);
 		}
 
 		if (cliente.getSalario().multiply(PERCENTUAL_MAX_PRESTACAO).compareTo(calcularPrestacao()) < 0) {
-			return false;
+			throw new RuntimeException("proposta não aprovada, valor maximo de parcela:  "
+					+ cliente.getSalario().multiply(PERCENTUAL_MAX_PRESTACAO).doubleValue() + " Parcela calculada: "
+					+ calcularPrestacao().doubleValue());
 		}
 
 		return true;
 	}
 
 	public PropostaSimulacaoDto simular() {
+		if (!this.validarEnquadramentoProposta()) {
+
+		}
 		return new PropostaSimulacaoDto(this.getCliente().getNome(), LocalDate.now(), quantidadeParcelas,
 				this.calcularPrestacao(), taxaJuros);
 
+	}
+
+	public void addParcela(Parcela parcela) {
+		parcelas.add(parcela);
 	}
 
 }

@@ -75,7 +75,7 @@ public class Cliente {
 	}
 	
 	public long calcularTempoServico() {
-		long diferencaEmMes = ChronoUnit.MONTHS.between(LocalDate.now(), dataContratacao);
+		long diferencaEmMes = ChronoUnit.MONTHS.between( dataContratacao, LocalDate.now());
 		return diferencaEmMes;
 	}
 

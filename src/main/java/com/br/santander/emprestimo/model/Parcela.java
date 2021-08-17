@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class Parcela {
 	@Id
@@ -18,13 +20,14 @@ public class Parcela {
 	private Integer numero;
 	private LocalDate dataParcela;
 	private StatusParcela status;
+	@JsonIgnore
 	@ManyToOne
 	private Proposta proposta;
 
-	public Parcela(BigDecimal valor, Integer numero, LocalDate dataParcela, Proposta proposta) {
+	public Parcela(BigDecimal valor, Integer numero, Proposta proposta) {
 		this.valor = valor;
 		this.numero = numero;
-		this.dataParcela = dataParcela;
+		this.dataParcela = LocalDate.now().plusMonths(numero);
 		this.proposta = proposta;
 		this.status = StatusParcela.AGENDADA;
 	}
