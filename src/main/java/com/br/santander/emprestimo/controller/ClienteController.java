@@ -50,6 +50,7 @@ public class ClienteController {
 				aberturaContaInputDto.getAgencia());
 		URI uri = uriBuilder.path("/clientes/conta/{id}").buildAndExpand(conta.getId()).toUri();
 		AberturaContaDto contaDto = AberturaContaDto.converte(conta);
+		System.out.println("testes");
 		return ResponseEntity.created(uri).body(contaDto);
 	}
 
