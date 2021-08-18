@@ -4,11 +4,14 @@ import java.util.List;
 
 import javax.persistence.EntityNotFoundException;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.br.santander.emprestimo.model.Cliente;
 import com.br.santander.emprestimo.model.Conta;
+import com.br.santander.emprestimo.model.dto.ClienteFiltroDto;
 import com.br.santander.emprestimo.repository.ClienteRepository;
+import com.br.santander.emprestimo.repository.specification.ClienteSpecification;
 import com.br.santander.emprestimo.service.ClienteService;
 import com.br.santander.emprestimo.service.ContaService;
 
@@ -29,8 +32,10 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
-	public List<Cliente> buscarTodos() {
-		return clienteRepository.findAll();
+	public List<Cliente> buscarTodos(ClienteFiltroDto filtro) {
+		return clienteRepository.findAll(Specification.where(ClienteSpecification.porNomeCliente(filtro.getNome())
+				.or(ClienteSpecification.porSalario(filtro.getSalario())
+						.or(ClienteSpecification.porDataContratacao(filtro.getDataContratacao())))));
 	}
 
 	@Override

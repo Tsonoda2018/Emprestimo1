@@ -1,7 +1,10 @@
 package com.br.santander.emprestimo.controller;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
 import java.net.URI;
 
+import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,9 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.br.santander.emprestimo.model.Cliente;
 import com.br.santander.emprestimo.model.Proposta;
-import com.br.santander.emprestimo.model.dto.ClienteInputDto;
 import com.br.santander.emprestimo.model.dto.PropostaInputDto;
 import com.br.santander.emprestimo.model.dto.PropostaSimulacaoDto;
 import com.br.santander.emprestimo.service.ClienteService;
@@ -35,7 +36,8 @@ public class PropostaController {
 		Proposta proposta = propostaInputDto.converte();
 		proposta.setCliente(clienteService.buscarPorId(propostaInputDto.getIdCliente()));
 		PropostaSimulacaoDto propostaSimulada = proposta.simular();
-		return ResponseEntity.ok().body(propostaSimulada);
+		Link propostas = linkTo(PropostaController.class).withRel("propostas").withType("POST");
+		return ResponseEntity.ok().body(propostaSimulada.add(propostas));
 	}
 
 	@PostMapping
@@ -46,4 +48,5 @@ public class PropostaController {
 		URI uri = uriBuilder.path("/propostas/{id}").buildAndExpand(propostaSalva.getId()).toUri();
 		return ResponseEntity.created(uri).body(propostaSalva);
 	}
+
 }
