@@ -62,6 +62,7 @@ public class ClienteController {
 			dto.add(self).add(clientes);
 			return dto;
 		}).collect(Collectors.toList());
+		System.out.println("2");
 		return ResponseEntity.ok(dtos);
 	}
 
