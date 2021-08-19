@@ -99,19 +99,19 @@ public class Proposta {
 		return PMT;
 	}
 
-	public boolean validarEnquadramentoProposta() {
+	public boolean validarEnquadramentoProposta() throws Exception {
 		if (this.cliente.calcularTempoServico() < QUANTIDADE_MESES_MIN) {
-			throw new RuntimeException("proposta não aprovada, tempo de serviço " + this.cliente.calcularTempoServico()
+			throw new Exception("proposta não aprovada, tempo de serviço " + this.cliente.calcularTempoServico()
 					+ " menor que " + QUANTIDADE_MESES_MIN);
 		}
 
 		if (this.cliente.getPatrimonio().compareTo(PATRIMONIO_MIN) < 0) {
-			throw new RuntimeException("proposta não aprovada, patrimonio " + this.cliente.getPatrimonio()
-					+ " menor que " + PATRIMONIO_MIN);
+			throw new Exception("proposta não aprovada, patrimonio " + this.cliente.getPatrimonio() + " menor que "
+					+ PATRIMONIO_MIN);
 		}
 
 		if (cliente.getSalario().multiply(PERCENTUAL_MAX_PRESTACAO).compareTo(calcularPrestacao()) < 0) {
-			throw new RuntimeException("proposta não aprovada, valor maximo de parcela:  "
+			throw new Exception("proposta não aprovada, valor maximo de parcela:  "
 					+ cliente.getSalario().multiply(PERCENTUAL_MAX_PRESTACAO).doubleValue() + " Parcela calculada: "
 					+ calcularPrestacao().doubleValue());
 		}
@@ -120,8 +120,13 @@ public class Proposta {
 	}
 
 	public PropostaSimulacaoDto simular() {
-		if (!this.validarEnquadramentoProposta()) {
+		try {
+			if (!this.validarEnquadramentoProposta()) {
+				throw new RuntimeException("Proposta não enquadrada");
 
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
 		}
 		return new PropostaSimulacaoDto(this.getCliente().getNome(), LocalDate.now(), quantidadeParcelas,
 				this.calcularPrestacao(), taxaJuros);
@@ -130,6 +135,10 @@ public class Proposta {
 
 	public void addParcela(Parcela parcela) {
 		parcelas.add(parcela);
+	}
+
+	public void setStatus(StatusProposta status) {
+		this.status = status;
 	}
 
 }

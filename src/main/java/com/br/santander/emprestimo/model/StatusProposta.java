@@ -10,6 +10,7 @@ package com.br.santander.emprestimo.model;
 public enum StatusProposta {
 	ANALISE,
 	REPROVADA,
-	APROVADA
+	APROVADA,
+	LIBERADA
 
 }

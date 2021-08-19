@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.br.santander.emprestimo.model.Parcela;
 import com.br.santander.emprestimo.model.Proposta;
+import com.br.santander.emprestimo.model.StatusProposta;
 import com.br.santander.emprestimo.model.dto.PropostaSimulacaoDto;
 import com.br.santander.emprestimo.repository.PropostaRepository;
 import com.br.santander.emprestimo.service.PagamentoService;
@@ -30,20 +31,27 @@ public class PropostaServiceImpl implements PropostaService {
 
 	@Override
 	public Proposta salvar(Proposta proposta) {
-		if (proposta.validarEnquadramentoProposta()) {
-			PropostaSimulacaoDto simular = proposta.simular();
-			for (int i = 1; i <= proposta.getQuantidadeParcelas(); i++) {
-				Parcela parcela = new Parcela(simular.getValorParcela(), i, proposta);
-				proposta.addParcela(parcela);
+		try {
+			if (proposta.validarEnquadramentoProposta()) {
+				PropostaSimulacaoDto simular = proposta.simular();
+				for (int i = 1; i <= proposta.getQuantidadeParcelas(); i++) {
+					Parcela parcela = new Parcela(simular.getValorParcela(), i, proposta);
+					proposta.addParcela(parcela);
 
+				}
+				proposta.setStatus(StatusProposta.APROVADA);
+				Proposta propostaSalva = propostaRepository.save(proposta);
+				proposta.getParcelas().forEach(p -> parcelaService.salvar(p));
+
+				return propostaSalva;
 			}
-			Proposta propostaSalva = propostaRepository.save(proposta);
-			proposta.getParcelas().forEach(p -> parcelaService.salvar(p));
-
-			return propostaSalva;
+		} catch (Exception e) {
+			proposta.setStatus(StatusProposta.REPROVADA);
+			propostaRepository.save(proposta);
+			throw new RuntimeException(e.getMessage());
 		}
+		return proposta;
 
-		throw new RuntimeException("Proposta não enquadrada");
 	}
 
 	@Override

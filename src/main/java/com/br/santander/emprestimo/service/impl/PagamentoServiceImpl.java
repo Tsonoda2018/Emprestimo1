@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.br.santander.emprestimo.model.Conta;
 import com.br.santander.emprestimo.model.Proposta;
+import com.br.santander.emprestimo.model.StatusProposta;
 import com.br.santander.emprestimo.service.ClienteService;
 import com.br.santander.emprestimo.service.ContaService;
 import com.br.santander.emprestimo.service.PagamentoService;
@@ -26,10 +27,14 @@ public class PagamentoServiceImpl implements PagamentoService {
 
 	@Override
 	public void liberarValor(Proposta proposta, Integer idConta) {
-		Conta conta = contaService.buscarPorId(idConta);
-
-		conta.depositar(proposta.getValor());
-		contaService.salvar(conta);
+		if (proposta.getStatus().equals(StatusProposta.APROVADA)) {
+			Conta conta = contaService.buscarPorId(idConta);
+			proposta.setStatus(StatusProposta.LIBERADA);
+			conta.depositar(proposta.getValor());
+			contaService.salvar(conta);
+		} else {
+			throw new RuntimeException("Proposta não aprovada. Não foi possível liberar.");
+		}
 
 	}
 
