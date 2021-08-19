@@ -10,6 +10,7 @@ import com.br.santander.emprestimo.model.Parcela;
 import com.br.santander.emprestimo.model.Proposta;
 import com.br.santander.emprestimo.model.dto.PropostaSimulacaoDto;
 import com.br.santander.emprestimo.repository.PropostaRepository;
+import com.br.santander.emprestimo.service.PagamentoService;
 import com.br.santander.emprestimo.service.ParcelaService;
 import com.br.santander.emprestimo.service.PropostaService;
 
@@ -18,10 +19,13 @@ public class PropostaServiceImpl implements PropostaService {
 
 	private final PropostaRepository propostaRepository;
 	private final ParcelaService parcelaService;
+	private final PagamentoService pagamentoService;
 
-	public PropostaServiceImpl(PropostaRepository propostaRepository, ParcelaService parcelaService) {
+	public PropostaServiceImpl(PropostaRepository propostaRepository, ParcelaService parcelaService,
+			PagamentoService pagamentoService) {
 		this.propostaRepository = propostaRepository;
 		this.parcelaService = parcelaService;
+		this.pagamentoService = pagamentoService;
 	}
 
 	@Override
@@ -31,7 +35,7 @@ public class PropostaServiceImpl implements PropostaService {
 			for (int i = 1; i <= proposta.getQuantidadeParcelas(); i++) {
 				Parcela parcela = new Parcela(simular.getValorParcela(), i, proposta);
 				proposta.addParcela(parcela);
-				
+
 			}
 			Proposta propostaSalva = propostaRepository.save(proposta);
 			proposta.getParcelas().forEach(p -> parcelaService.salvar(p));
@@ -56,6 +60,12 @@ public class PropostaServiceImpl implements PropostaService {
 	@Override
 	public void excluir(Integer id) {
 		propostaRepository.delete(this.buscarPorId(id));
+	}
+
+	@Override
+	public void liberar(Proposta proposta, Integer idConta) {
+		pagamentoService.liberarValor(proposta, idConta);
+
 	}
 
 }

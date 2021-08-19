@@ -8,6 +8,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,6 +48,13 @@ public class PropostaController {
 		Proposta propostaSalva = propostaService.salvar(proposta);
 		URI uri = uriBuilder.path("/propostas/{id}").buildAndExpand(propostaSalva.getId()).toUri();
 		return ResponseEntity.created(uri).body(propostaSalva);
+	}
+	
+	@PutMapping
+	public ResponseEntity<?> liberarProposta(Integer idProposta, Integer idConta) {
+		Proposta proposta = propostaService.buscarPorId(idProposta);
+		propostaService.liberar(proposta, idConta);
+		return ResponseEntity.ok(proposta);
 	}
 
 }

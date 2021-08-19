@@ -12,4 +12,6 @@ public interface PropostaService {
 	Proposta buscarPorId(Integer id);
 	
 	void excluir(Integer id);
+
+	void liberar(Proposta proposta, Integer idConta);
 }
