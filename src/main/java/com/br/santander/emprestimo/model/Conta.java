@@ -55,6 +55,9 @@ public class Conta {
 	}
 
 	public void sacar(BigDecimal valor) {
+		if (this.saldo.compareTo(valor) < 0) {
+			throw new RuntimeException("Saldo insuficiente.");
+		}
 		this.saldo = this.saldo.min(valor);
 	}
 

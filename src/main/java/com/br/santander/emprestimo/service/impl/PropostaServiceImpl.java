@@ -41,8 +41,8 @@ public class PropostaServiceImpl implements PropostaService {
 				}
 				proposta.setStatus(StatusProposta.APROVADA);
 				Proposta propostaSalva = propostaRepository.save(proposta);
-				proposta.getParcelas().forEach(p -> parcelaService.salvar(p));
-
+//				proposta.getParcelas().forEach(p -> parcelaService.salvar(p));
+				parcelaService.salvarTodos(proposta.getParcelas());
 				return propostaSalva;
 			}
 		} catch (Exception e) {

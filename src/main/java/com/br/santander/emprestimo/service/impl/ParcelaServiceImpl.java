@@ -39,4 +39,10 @@ public class ParcelaServiceImpl implements ParcelaService {
 		return parcelaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Não existe parcela com o id " + id));
 	}
 
+	@Override
+	public void salvarTodos(List<Parcela> parcelas) {
+		parcelaRepository.saveAll(parcelas);
+		
+	}
+
 }

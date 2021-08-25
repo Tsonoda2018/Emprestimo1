@@ -39,7 +39,7 @@ public class Proposta {
 	private LocalDate dataContratacao;
 	private StatusProposta status;
 
-	@OneToMany(mappedBy = "proposta", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "proposta", cascade = CascadeType.REMOVE)
 	private List<Parcela> parcelas = new ArrayList<>();
 
 	public Proposta(BigDecimal valor, Integer quantidadeParcelas, Cliente cliente) {

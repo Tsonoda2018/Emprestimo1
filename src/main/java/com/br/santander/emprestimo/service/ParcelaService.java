@@ -12,4 +12,6 @@ public interface ParcelaService {
 	Parcela buscarPorId(Integer id);
 	
 	void excluir(Integer id);
+
+	void salvarTodos(List<Parcela> parcelas);
 }

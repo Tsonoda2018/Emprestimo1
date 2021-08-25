@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -50,8 +51,8 @@ public class PropostaController {
 		return ResponseEntity.created(uri).body(propostaSalva);
 	}
 	
-	@PutMapping
-	public ResponseEntity<?> liberarProposta(Integer idProposta, Integer idConta) {
+	@PutMapping("/liberar")
+	public ResponseEntity<?> liberarProposta(@RequestParam Integer idProposta, @RequestParam Integer idConta) {
 		Proposta proposta = propostaService.buscarPorId(idProposta);
 		propostaService.liberar(proposta, idConta);
 		return ResponseEntity.ok(proposta);
