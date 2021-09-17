@@ -6,6 +6,7 @@ import java.net.URI;
 
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,6 +43,7 @@ public class PropostaController {
 		return ResponseEntity.ok().body(propostaSimulada.add(propostas));
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping
 	public ResponseEntity<?> salvar(@RequestBody PropostaInputDto propostaInputDto, UriComponentsBuilder uriBuilder) {
 		Proposta proposta = propostaInputDto.converte();
@@ -51,6 +53,7 @@ public class PropostaController {
 		return ResponseEntity.created(uri).body(propostaSalva);
 	}
 	
+	@PreAuthorize("hasAuthority('ROLE_ADM')")
 	@PutMapping("/liberar")
 	public ResponseEntity<?> liberarProposta(@RequestParam Integer idProposta, @RequestParam Integer idConta) {
 		Proposta proposta = propostaService.buscarPorId(idProposta);
